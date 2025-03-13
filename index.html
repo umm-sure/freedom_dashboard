@@ -61,7 +61,9 @@
       <option value="pred_cl" data-desc="Predicted civil liberties score">Predicted Civil Liberties</option>
       <option value="pred_pr" data-desc="Predicted political rights score">Predicted Political Rights</option>
       <option value="pred_status" data-desc="Predicted Freedom House status (1: Free, 2: Partly Free, 3: Not Free)">Predicted Status</option>
-      <option value="e_wb_pop" data-desc="Predicted Freedom House status (1: Free, 2: Partly Free, 3: Not Free)">Predicted Status</option>
+      <option value="v2x_accountability" data-desc="Measures constraints on the government’s use of political power 
+        through requirements for justification for its actions and potential sanctions.">Accountability Index</option>
+      
     </select>
     <br/>
     <label for="featureSelect2">Choose Second Feature:</label>
@@ -84,6 +86,8 @@
       <option value="pred_cl" data-desc="Predicted civil liberties score">Predicted Civil Liberties</option>
       <option value="pred_pr" data-desc="Predicted political rights score">Predicted Political Rights</option>
       <option value="pred_status" data-desc="Predicted Freedom House status (1: Free, 2: Partly Free, 3: Not Free)">Predicted Status</option>
+      <option value="v2x_accountability" data-desc="Measures constraints on the government’s use of political power 
+        through requirements for justification for its actions and potential sanctions.">Accountability Index</option>
     </select>
   </div>
   <div id="descriptionPopup">
@@ -122,6 +126,7 @@
               <b>Population:</b> ${attributes.e_wb_pop} <br>
               <b>e_fh_status:</b> ${attributes.e_fh_status} <br>
               <b>v2x_mpi:</b> ${round(attributes.v2x_mpi)} <br>
+              <b>v2x_accountability:</b> ${round(attributes.v2x_accountability)} <br>
               <b>e_lexical_index:</b> ${attributes.e_lexical_index} <br>
               <b>v2x_libdem:</b> ${round(attributes.v2x_libdem)} <br>
               <b>v2xcl_rol:</b> ${round(attributes.v2xcl_rol)} <br>
@@ -293,6 +298,7 @@
       function showFeatureDescription() {
         const select = document.getElementById("featureSelect");
         const description = select.options[select.selectedIndex].dataset.desc;
+        document.getElementById("descriptionPopup").innerHTML = `<h4>${select.value}</h4> <p id="featureDesc">Select a variable to see its description.</p>`;
         document.getElementById("featureDesc").innerText = description;
         document.getElementById("descriptionPopup").style.display = "block";
       }
