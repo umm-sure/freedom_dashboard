@@ -18,27 +18,45 @@
       top: 10px;
       left: 10px;
       background: white;
-      padding: 10px;
+      padding: 5px;
       z-index: 10;
       border-radius: 5px;
+      font-size: 1em;
+      max-width: 90%;
+      width: auto;
     }
     #descriptionPopup {
       position: absolute;
       top: 10px;
       right: 10px;
       background: white;
-      padding: 10px;
+      padding: 5px;
       z-index: 10;
       border-radius: 2px;
       border: black;
       display: none;
+      font-size: 1em;
+      max-width: 90%;
+      width: auto;
+    }
+    @media screen and (max-width: 600px) {
+      #controls {
+        font-size: 0.8em;
+        padding: 3px;
+        width: 95%;
+      }
+      #descriptionPopup {
+        font-size: 0.8em;
+        padding: 3px;
+        width: 95%;
+      }
     }
   </style>
 </head>
 <body>
   <div id="controls">
     <label for="yearSlider">Select Year:</label>
-    <input type="range" id="yearSlider" min="1960" max="2022" value="2010" step="1"/>
+    <input type="range" id="yearSlider" min="1960" max="2021" value="2010" step="1"/>
     <span id="yearLabel">2010</span>
     <br/>
     <label for="featureSelect">Choose Feature:</label>
