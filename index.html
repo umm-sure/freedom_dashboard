@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Choropleth Map with ArcGIS</title>
+  <title>Country Dashboard</title>
   <link rel="stylesheet" href="https://js.arcgis.com/4.29/esri/themes/light/main.css" />
   <script src="https://js.arcgis.com/4.29/"></script>
   <style>
@@ -61,6 +61,7 @@
       <option value="pred_cl" data-desc="Predicted civil liberties score">Predicted Civil Liberties</option>
       <option value="pred_pr" data-desc="Predicted political rights score">Predicted Political Rights</option>
       <option value="pred_status" data-desc="Predicted Freedom House status (1: Free, 2: Partly Free, 3: Not Free)">Predicted Status</option>
+      <option value="e_wb_pop" data-desc="Predicted Freedom House status (1: Free, 2: Partly Free, 3: Not Free)">Predicted Status</option>
     </select>
     <br/>
     <label for="featureSelect2">Choose Second Feature:</label>
@@ -100,15 +101,17 @@
       "esri/rest/support/Query"
     ], function(Map, MapView, FeatureLayer, Legend, Query) {
 
+      //create a new map instance with a topo vector basemap
       const map = new Map({ basemap: "topo-vector" });
       const view = new MapView({ container: "viewDiv", map: map, center: [0, 20], zoom: 3, constraints: {minZoom: 3} });
 
+      //create a feature layer from hosted data
       const layer = new FeatureLayer({
-        url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/Dashboard_data/FeatureServer",
+        url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/country_factors/FeatureServer",
         outFields: ["*"],
         definitionExpression: "year = 2010",
         popupTemplate: {
-          title: "{Country}",
+          title: "{cntry_name}",
           content: function(feature) {
             const attributes = feature.graphic.attributes;
             function round(value) {
@@ -116,6 +119,7 @@
             }
             return `
               <b>Year:</b> ${attributes.year} <br>
+              <b>Population:</b> ${attributes.e_wb_pop} <br>
               <b>e_fh_status:</b> ${attributes.e_fh_status} <br>
               <b>v2x_mpi:</b> ${round(attributes.v2x_mpi)} <br>
               <b>e_lexical_index:</b> ${attributes.e_lexical_index} <br>
@@ -134,21 +138,21 @@
       });
       map.add(layer);
 
+      //create a legend and add it to the bottom right of the view
       let legend = new Legend({ view: view });
       view.ui.add(legend, "bottom-right");
 
       function updateLayer() {
+        //called everytime there is an interaction
         const selectedFeature1 = document.getElementById("featureSelect").value;
         const selectedFeature2 = document.getElementById("featureSelect2").value;
         const selectedYear = document.getElementById("yearSlider").value;
         document.getElementById("yearLabel").innerText = selectedYear;
         
-        // Always update the layer definition for the year
         layer.definitionExpression = `year = ${selectedYear}`;
         
-        // If a second feature is selected (not "No feature"), create a bivariate relationship renderer
         if (selectedFeature2 !== "none") {
-        // Ensure the layer is fully loaded before creating the relationship renderer
+        //ensure  layer is fully loaded before creating the relationship renderer
         layer.when(() => {
             require(["esri/smartMapping/renderers/relationship"], function(relationshipRendererCreator) {
             relationshipRendererCreator.createRenderer({
@@ -185,11 +189,13 @@
             });
             });
         });
-        return; // Skip the single-feature rendering logic
+        return; //Skip the single-feature rendering logic
         }
 
         
-        // Single-feature rendering logic (unchanged)
+        //single-feature rendering logic
+
+        //Finding the range of the data
         const query = new Query();
         query.where = `year = ${selectedYear}`;
         query.outStatistics = [
@@ -211,6 +217,8 @@
           const minValue = stats.minValue;
           const maxValue = stats.maxValue;
           
+          //finding the number of unique values to determine the type of renderer
+          //either ranges or individual value matching
           const query2 = new Query();
           query2.where = `year = ${selectedYear}`;
           query2.returnGeometry = false;
@@ -226,6 +234,7 @@
           layer.queryFeatures(query2).then(function (result2) {
             const uniqueValues = result2.features.length;
             if (uniqueValues > 7) {
+              //simple 20% breaks
               const range = maxValue - minValue;
               layer.renderer = {
                 type: "class-breaks",
@@ -243,8 +252,11 @@
               layer.opacity = 0.7;
               layer.refresh();
             } else {
+              //unique values
               let uniques = [];
               for (let i = minValue; i <= maxValue; i++) {
+                //color trickery for nice colors, can interpolate between different chosen colors
+                //currently purple to green
                 let normalized = (i - minValue) / (maxValue - minValue);
                 let red, green, blue;
                 if (normalized < 0.5) {
@@ -277,6 +289,7 @@
         });
       }
 
+      //for describing first chosen feature
       function showFeatureDescription() {
         const select = document.getElementById("featureSelect");
         const description = select.options[select.selectedIndex].dataset.desc;
@@ -284,6 +297,7 @@
         document.getElementById("descriptionPopup").style.display = "block";
       }
 
+      //event listeners
       document.getElementById("yearSlider").addEventListener("input", updateLayer);
       document.getElementById("featureSelect").addEventListener("change", () => {
         updateLayer();
