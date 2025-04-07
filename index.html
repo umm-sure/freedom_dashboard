@@ -39,6 +39,18 @@
       max-width: 90%;
       width: auto;
     }
+    #regionalAnalysis {
+      position: absolute;
+      bottom: 30px;
+      left: 10px;
+      background: white;
+      padding: 5px;
+      z-index: 10;
+      border-radius: 5px;
+      font-size: 1.4em;
+      max-width: 90%;
+      width: auto;
+    }
     @media screen and (max-width: 600px) {
       #controls {
         font-size: 0.8em;
@@ -112,6 +124,9 @@
     <p id="featureDesc">Select a variable to see its description.</p>
   </div>
   <div id="viewDiv"></div>
+  <div id="regionalAnalysis">
+    <a href="https://freedomanalysis.streamlit.app/" target="_blank"><b>Regional Analysis</b></a>
+  </div>
   
   <script>
     require([
